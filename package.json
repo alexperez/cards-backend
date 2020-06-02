@@ -1,0 +1,20 @@
+{
+  "name": "cards-backend",
+  "version": "1.0.0",
+  "description": "Backend for flashcards app.",
+  "main": "server.js",
+  "author": "Alex Perez <alex.alb.perez@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "start": "nodemon server.js"
+  },
+  "dependencies": {
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "helmet": "^3.22.0",
+    "morgan": "^1.10.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.4"
+  }
+}
