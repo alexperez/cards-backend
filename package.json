@@ -6,7 +6,7 @@
   "author": "Alex Perez <alex.alb.perez@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "start": "nodemon server.js"
+    "start": "NODE_ENV=development nodemon server.js"
   },
   "dependencies": {
     "bcrypt": "^4.0.1",
@@ -17,6 +17,7 @@
     "helmet": "^3.22.0",
     "mongoose": "^5.9.17",
     "morgan": "^1.10.0",
+    "rate-limiter-flexible": "^2.1.7",
     "validatorjs": "^3.18.1"
   },
   "devDependencies": {

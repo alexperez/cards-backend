@@ -1,5 +1,3 @@
 const getSessionUser = ({ id, username }) => ({ id, username });
 
-module.exports = {
-    getSessionUser,
-};
+module.exports = { getSessionUser };

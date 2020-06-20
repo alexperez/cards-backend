@@ -76,12 +76,16 @@ UserSchema.statics.authenticate = async function (username, password) {
             const match = await compare(password, user.password);
 
             if (match) {
-                return user;
+                return { user };
             } else {
-                throw new Error("Password is incorrect.");
+                const error = new Error("Password is incorrect");
+
+                return { error };
             }
         } else {
-            throw new Error("User with this username does not exist.");
+            const error = new Error("User with this username does not exist.");
+
+            return { error };
         }
     } catch ({ message }) {
         throw new Error(message);

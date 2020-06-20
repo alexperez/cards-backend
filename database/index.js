@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
+const { MONGODB_URI } = require("../config");
 
-(async () => {
+module.exports = async () => {
     try {
         const options = {
             useNewUrlParser: true,
@@ -8,11 +9,11 @@ const mongoose = require("mongoose");
             useCreateIndex: true,
         };
 
-        await mongoose.connect(process.env.MONGODB_DEV, options);
+        await mongoose.connect(MONGODB_URI, options);
         console.log("Successfully connected to MongoDB!");
+
+        return mongoose.connection;
     } catch (e) {
         console.error(e);
     }
-})();
-
-module.exports = mongoose.connection;
+};

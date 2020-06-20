@@ -1,7 +1,11 @@
 const indexRouter = require("express").Router();
 const User = require("../database/schemas/User");
-const authValidator = require("../validators/users");
-const { getSessionUser } = require("../utilities/helpers");
+const authValidator = require("../middlewares/validators/auth");
+const { getSessionUser } = require("../utilities");
+const {
+    rateLimiterMongo,
+    maxConsecutiveFailsByUsername,
+} = require("../config/rate-limit");
 
 indexRouter.get("/session", (req, res) => res.json(req.session.user));
 
@@ -25,16 +29,55 @@ indexRouter.post("/signup", authValidator, async (req, res) => {
 indexRouter.post("/login", authValidator, async (req, res) => {
     try {
         const { username, password } = req.body;
-        const user = await User.authenticate(username, password);
+        const rlResUsername = await rateLimiterMongo.get(username);
 
-        if (user) {
-            const sessionUser = getSessionUser(user);
+        if (
+            rlResUsername !== null &&
+            rlResUsername.consumedPoints > maxConsecutiveFailsByUsername
+        ) {
+            const retrySecs =
+                Math.round(rlResUsername.msBeforeNext / 1000) || 1;
 
-            req.session.user = sessionUser;
-            res.send({
-                message: "Successfully logged in.",
-                ...sessionUser,
-            });
+            res.set("Retry-After", String(retrySecs));
+            res.status(429).json({ message: "Too many requests." });
+        } else {
+            const { user, error } = await User.authenticate(username, password);
+
+            if (!user) {
+                try {
+                    await rateLimiterMongo.consume(username);
+                    const { message } = error;
+
+                    res.status(400).json({ message });
+                } catch (e) {
+                    if (e instanceof Error) {
+                        throw e;
+                    } else {
+                        const retrySecs =
+                            Math.round(e.msBeforeNext / 1000) || 1;
+
+                        res.set("Retry-After", String(retrySecs));
+                        res.status(429).json({ message: "Too many requests." });
+                    }
+                }
+            }
+
+            if (user) {
+                if (
+                    rlResUsername !== null &&
+                    rlResUsername.consumedPoints > 0
+                ) {
+                    await rateLimiterMongo.delete(username);
+                }
+
+                const sessionUser = getSessionUser(user);
+
+                req.session.user = sessionUser;
+                res.status(200).json({
+                    message: "Successfully logged in.",
+                    ...sessionUser,
+                });
+            }
         }
     } catch ({ message }) {
         res.status(500).json({ message });
