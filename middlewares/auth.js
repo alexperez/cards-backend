@@ -1,4 +1,4 @@
-const validator = require("./index");
+const validator = require("../config/validator");
 
 const messages = {
     "/signup": "Signup validation failed.",
