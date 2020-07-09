@@ -10,12 +10,14 @@ const UserSchema = new Schema(
             required: true,
             maxlength: 40,
             trim: true,
+            lowercase: true,
         },
         email: {
             type: String,
             required: true,
             maxlength: 250,
             trim: true,
+            lowercase: true,
         },
         password: {
             type: String,
@@ -68,9 +70,11 @@ UserSchema.statics.createUser = async function (data) {
     }
 };
 
-UserSchema.statics.authenticate = async function (username, password) {
+UserSchema.statics.authenticate = async function (login, password) {
     try {
-        const user = await this.findOne({ username }).exec();
+        const user = await this.findOne({
+            $or: [{ username: login }, { email: login }],
+        }).exec();
 
         if (user !== null) {
             const match = await compare(password, user.password);
@@ -78,12 +82,14 @@ UserSchema.statics.authenticate = async function (username, password) {
             if (match) {
                 return { user };
             } else {
-                const error = new Error("Password is incorrect");
+                const error = new Error("Incorrect username or password.");
 
                 return { error };
             }
         } else {
-            const error = new Error("User with this username does not exist.");
+            const error = new Error(
+                "No user found with this username and password."
+            );
 
             return { error };
         }

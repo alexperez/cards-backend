@@ -1,6 +1,6 @@
 const indexRouter = require("express").Router();
 const User = require("../database/schemas/User");
-const authValidator = require("../middlewares/validators/auth");
+const authValidator = require("../middlewares/auth");
 const { getSessionUser } = require("../utilities");
 const {
     rateLimiterMongo,
@@ -26,10 +26,10 @@ indexRouter.post("/signup", authValidator, async (req, res) => {
     }
 });
 
-indexRouter.post("/login", authValidator, async (req, res) => {
+indexRouter.post("/login", async (req, res) => {
     try {
-        const { username, password } = req.body;
-        const rlResUsername = await rateLimiterMongo.get(username);
+        const { login, password } = req.body;
+        const rlResUsername = await rateLimiterMongo.get(login);
 
         if (
             rlResUsername !== null &&
@@ -41,11 +41,11 @@ indexRouter.post("/login", authValidator, async (req, res) => {
             res.set("Retry-After", String(retrySecs));
             res.status(429).json({ message: "Too many requests." });
         } else {
-            const { user, error } = await User.authenticate(username, password);
+            const { user, error } = await User.authenticate(login, password);
 
             if (!user) {
                 try {
-                    await rateLimiterMongo.consume(username);
+                    await rateLimiterMongo.consume(login);
                     const { message } = error;
 
                     res.status(400).json({ message });
@@ -67,7 +67,7 @@ indexRouter.post("/login", authValidator, async (req, res) => {
                     rlResUsername !== null &&
                     rlResUsername.consumedPoints > 0
                 ) {
-                    await rateLimiterMongo.delete(username);
+                    await rateLimiterMongo.delete(login);
                 }
 
                 const sessionUser = getSessionUser(user);
