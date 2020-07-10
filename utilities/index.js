@@ -1,3 +1,5 @@
 const getSessionUser = ({ id, username }) => ({ id, username });
 
-module.exports = { getSessionUser };
+const getValidatorErrors = (errors) => Object.values(errors).flat();
+
+module.exports = { getSessionUser, getValidatorErrors };
