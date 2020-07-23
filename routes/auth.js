@@ -1,32 +1,43 @@
-const indexRouter = require("express").Router();
+const authRouter = require("express").Router();
 const User = require("../database/schemas/User");
-const authValidator = require("../middlewares/auth");
+const { authValidatorRules, authValidator } = require("../middlewares/auth");
 const { getSessionUser } = require("../utilities");
 const {
     rateLimiterMongo,
     maxConsecutiveFailsByUsername,
 } = require("../config/rate-limit");
 
-indexRouter.get("/session", (req, res) => res.json(req.session.user));
+authRouter.get("/session", (req, res) => {
+    const { user } = req.session;
 
-indexRouter.post("/signup", authValidator, async (req, res) => {
-    try {
-        const { username, email, password } = req.body;
-        const data = { username, email, password };
-        const user = await User.createUser(data);
-        const sessionUser = getSessionUser(user);
-
-        req.session.user = sessionUser;
-        res.status(200).json({
-            message: "Account successfully created.",
-            ...sessionUser,
-        });
-    } catch ({ message }) {
-        res.status(500).json({ message });
-    }
+    res.json({ user, isAuthenticated: !!user });
 });
 
-indexRouter.post("/login", async (req, res) => {
+authRouter.post(
+    "/signup",
+    authValidatorRules(),
+    authValidator,
+    async (req, res) => {
+        try {
+            const { username, email, password } = req.body;
+            const data = { username, email, password };
+            const user = await User.createUser(data);
+            const sessionUser = getSessionUser(user);
+
+            req.session.user = sessionUser;
+            res.status(200).json({
+                message: "Account successfully created.",
+                user: sessionUser,
+                isAuthenticated: true,
+                redirectUrl: "/",
+            });
+        } catch ({ message }) {
+            res.status(500).json({ message });
+        }
+    }
+);
+
+authRouter.post("/login", async (req, res) => {
     try {
         const { login, password } = req.body;
         const rlResUsername = await rateLimiterMongo.get(login);
@@ -75,7 +86,9 @@ indexRouter.post("/login", async (req, res) => {
                 req.session.user = sessionUser;
                 res.status(200).json({
                     message: "Successfully logged in.",
-                    ...sessionUser,
+                    user: sessionUser,
+                    isAuthenticated: true,
+                    redirectUrl: "/",
                 });
             }
         }
@@ -84,7 +97,7 @@ indexRouter.post("/login", async (req, res) => {
     }
 });
 
-indexRouter.post("/logout", async (req, res) => {
+authRouter.post("/logout", async (req, res) => {
     try {
         const { user } = req.session;
 
@@ -95,6 +108,7 @@ indexRouter.post("/logout", async (req, res) => {
                 res.clearCookie(process.env.SESSION_NAME);
                 res.status(200).send({
                     message: "Successfully logged out.",
+                    redirectUrl: "/",
                 });
             });
         } else {
@@ -105,4 +119,4 @@ indexRouter.post("/logout", async (req, res) => {
     }
 });
 
-module.exports = indexRouter;
+module.exports = authRouter;

@@ -52,13 +52,9 @@ UserSchema.statics.createUser = async function (data) {
 
         if (user) {
             if (user.username === username) {
-                throw new Error(
-                    "That username already exists. Please use a different username"
-                );
+                throw new Error("Username not available.");
             } else if (user.email === email) {
-                throw new Error(
-                    "That email already exists. Please use a different email"
-                );
+                throw new Error("Email already taken.");
             }
         } else {
             const newUser = await this.create(data);
