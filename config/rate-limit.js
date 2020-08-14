@@ -1,17 +1,28 @@
 const mongoose = require("mongoose");
 const { RateLimiterMongo } = require("rate-limiter-flexible");
 
-const maxConsecutiveFailsByUsername = 5;
-const options = {
-    storeClient: mongoose.connection,
-    points: maxConsecutiveFailsByUsername,
-    duration: 7200,
-    blockDuration: 900,
-};
+const maxWrongAttemptsByIPperDay = 100;
+const maxConsecutiveFailsByUsernameAndIP = 10;
 
-const rateLimiterMongo = new RateLimiterMongo(options);
+const rlSlowBruteByIP = new RateLimiterMongo({
+    storeClient: mongoose.connection,
+    keyPrefix: "login_fail_ip_per_day",
+    points: maxWrongAttemptsByIPperDay,
+    duration: 60 * 60 * 24,
+    blockDuration: 60 * 60 * 24,
+});
+
+const rlConsecutiveFailsByUsernameAndIP = new RateLimiterMongo({
+    storeClient: mongoose.connection,
+    keyPrefix: "login_fail_consecutive_username_and_ip",
+    points: maxConsecutiveFailsByUsernameAndIP,
+    duration: 60 * 60 * 24 * 90,
+    blockDuration: 60 * 60,
+});
 
 module.exports = {
-    rateLimiterMongo,
-    maxConsecutiveFailsByUsername,
+    rlSlowBruteByIP,
+    rlConsecutiveFailsByUsernameAndIP,
+    maxWrongAttemptsByIPperDay,
+    maxConsecutiveFailsByUsernameAndIP,
 };

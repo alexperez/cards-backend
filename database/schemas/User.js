@@ -1,7 +1,5 @@
-const mongoose = require("mongoose");
+const { Schema, model } = require("mongoose");
 const { compare, hash } = require("bcrypt");
-
-const Schema = mongoose.Schema;
 
 const UserSchema = new Schema(
     {
@@ -25,6 +23,12 @@ const UserSchema = new Schema(
             minlength: 6,
             trim: true,
         },
+        sets: [
+            {
+                type: Schema.Types.ObjectId,
+                ref: "Set",
+            },
+        ],
     },
     { timestamps: true }
 );
@@ -75,23 +79,23 @@ UserSchema.statics.authenticate = async function (login, password) {
         if (user !== null) {
             const match = await compare(password, user.password);
 
+            const userObj = { exists: true };
+
             if (match) {
-                return { user };
+                return { ...userObj, isLoggedIn: true, data: user };
             } else {
                 const error = new Error("Incorrect username or password.");
 
-                return { error };
+                return { ...userObj, isLoggedIn: false, error };
             }
         } else {
-            const error = new Error(
-                "No user found with this username and password."
-            );
+            const error = new Error("No user found with this username");
 
-            return { error };
+            return { isLoggedIn: false, error };
         }
     } catch ({ message }) {
         throw new Error(message);
     }
 };
 
-module.exports = mongoose.model("User", UserSchema);
+module.exports = model("User", UserSchema);

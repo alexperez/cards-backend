@@ -1,11 +1,12 @@
 const authRouter = require("express").Router();
 const User = require("../database/schemas/User");
-const { authValidatorRules, authValidator } = require("../middlewares/auth");
-const { getSessionUser } = require("../utilities");
 const {
-    rateLimiterMongo,
-    maxConsecutiveFailsByUsername,
-} = require("../config/rate-limit");
+    authValidatorRules,
+    authValidator,
+    rateLimiter,
+} = require("../middlewares/auth");
+const { getSessionUser } = require("../utilities");
+const { SESSION_NAME } = require("../config");
 
 authRouter.get("/session", (req, res) => {
     const { user } = req.session;
@@ -29,7 +30,6 @@ authRouter.post(
                 message: "Account successfully created.",
                 user: sessionUser,
                 isAuthenticated: true,
-                redirectUrl: "/",
             });
         } catch ({ message }) {
             res.status(500).json({ message });
@@ -37,64 +37,16 @@ authRouter.post(
     }
 );
 
-authRouter.post("/login", async (req, res) => {
-    try {
-        const { login, password } = req.body;
-        const rlResUsername = await rateLimiterMongo.get(login);
+authRouter.post("/login", rateLimiter, async (req, res) => {
+    const { user } = res.locals;
+    const sessionUser = getSessionUser(user);
 
-        if (
-            rlResUsername !== null &&
-            rlResUsername.consumedPoints > maxConsecutiveFailsByUsername
-        ) {
-            const retrySecs =
-                Math.round(rlResUsername.msBeforeNext / 1000) || 1;
-
-            res.set("Retry-After", String(retrySecs));
-            res.status(429).json({ message: "Too many requests." });
-        } else {
-            const { user, error } = await User.authenticate(login, password);
-
-            if (!user) {
-                try {
-                    await rateLimiterMongo.consume(login);
-                    const { message } = error;
-
-                    res.status(400).json({ message });
-                } catch (e) {
-                    if (e instanceof Error) {
-                        throw e;
-                    } else {
-                        const retrySecs =
-                            Math.round(e.msBeforeNext / 1000) || 1;
-
-                        res.set("Retry-After", String(retrySecs));
-                        res.status(429).json({ message: "Too many requests." });
-                    }
-                }
-            }
-
-            if (user) {
-                if (
-                    rlResUsername !== null &&
-                    rlResUsername.consumedPoints > 0
-                ) {
-                    await rateLimiterMongo.delete(login);
-                }
-
-                const sessionUser = getSessionUser(user);
-
-                req.session.user = sessionUser;
-                res.status(200).json({
-                    message: "Successfully logged in.",
-                    user: sessionUser,
-                    isAuthenticated: true,
-                    redirectUrl: "/",
-                });
-            }
-        }
-    } catch ({ message }) {
-        res.status(500).json({ message });
-    }
+    req.session.user = sessionUser;
+    res.status(200).json({
+        message: "Successfully logged in.",
+        user: sessionUser,
+        isAuthenticated: true,
+    });
 });
 
 authRouter.post("/logout", async (req, res) => {
@@ -105,10 +57,9 @@ authRouter.post("/logout", async (req, res) => {
             req.session.destroy((e) => {
                 if (e) throw e;
 
-                res.clearCookie(process.env.SESSION_NAME);
+                res.clearCookie(SESSION_NAME);
                 res.status(200).send({
                     message: "Successfully logged out.",
-                    redirectUrl: "/",
                 });
             });
         } else {
