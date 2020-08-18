@@ -20,6 +20,7 @@ initDb().then((dbConnection) => {
 });
 
 app.on("ready", ({ dbConnection }) => {
+    app.set("trust proxy", 1);
     app.use(helmet());
     app.use(morgan("tiny"));
     app.use(express.urlencoded({ extended: true }));
