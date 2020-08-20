@@ -12,6 +12,7 @@ const MongoStore = require("connect-mongo")(session);
 const { NODE_ENV, PORT, SESSION_NAME, SESSION_SECRET } = require("./config");
 
 const authRouter = require("./routes/auth");
+const topicsRouter = require("./routes/topics");
 
 const app = express();
 
@@ -45,6 +46,7 @@ app.on("ready", ({ dbConnection }) => {
     );
 
     app.use("/auth", authRouter);
+    app.use("/topics", topicsRouter);
 
     app.listen(PORT, () =>
         console.log(`Listening at http://localhost:${PORT}`)
