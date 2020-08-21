@@ -37,7 +37,7 @@ authRouter.post(
     }
 );
 
-authRouter.post("/login", rateLimiter, async (req, res) => {
+authRouter.post("/login", rateLimiter, (req, res) => {
     const { user } = res.locals;
     const sessionUser = getSessionUser(user);
 
@@ -49,7 +49,7 @@ authRouter.post("/login", rateLimiter, async (req, res) => {
     });
 });
 
-authRouter.post("/logout", async (req, res) => {
+authRouter.post("/logout", (req, res) => {
     try {
         const { user } = req.session;
 

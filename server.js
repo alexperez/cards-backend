@@ -34,13 +34,13 @@ app.on("ready", ({ dbConnection }) => {
             resave: false,
             store: new MongoStore({
                 mongooseConnection: dbConnection,
-                ttl: 2 * 60 * 60,
-                touchAfter: 24 * 60 * 60,
+                ttl: 60 * 60 * 2,
+                touchAfter: 60 * 60 * 24,
             }),
             cookie: {
                 sameSite: true,
                 secure: NODE_ENV === "production",
-                maxAge: 7200000,
+                maxAge: 1000 * 60 * 60 * 2,
             },
         })
     );

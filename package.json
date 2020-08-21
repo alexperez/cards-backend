@@ -6,7 +6,7 @@
   "author": "Alex Perez <alex.alb.perez@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "start": "NODE_ENV=development nodemon server.js"
+    "start": "nodemon server.js"
   },
   "dependencies": {
     "bcrypt": "^4.0.1",
