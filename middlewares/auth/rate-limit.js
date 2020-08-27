@@ -64,18 +64,13 @@ const rateLimiter = async (req, res, next) => {
                         "Retry-After",
                         String(Math.round(e.msBeforeNext / 1000)) || 1
                     );
-                    return res
-                        .status(429)
-                        .json({ message: "Too many requests." });
+                    return res.status(429).json({ message: "Too many requests." });
                 }
             }
         }
 
         if (user.isLoggedIn) {
-            if (
-                resUsernameAndIP !== null &&
-                resUsernameAndIP.consumedPoints > 0
-            ) {
+            if (resUsernameAndIP !== null && resUsernameAndIP.consumedPoints > 0) {
                 await rlConsecutiveFailsByUsernameAndIP.delete(usernameIPKey);
             }
 

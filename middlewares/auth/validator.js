@@ -20,9 +20,7 @@ const authValidatorRules = () => [
     body(
         "password",
         "Password must contain at least one uppercase letter, one lowercase letter and one number."
-    ).custom((value) =>
-        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]/.test(value)
-    ),
+    ).custom((value) => /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]/.test(value)),
 ];
 
 const errorFormatter = ({ msg }) => msg;

@@ -1,8 +1,7 @@
-const topicsRouter = require("express").Router();
 const Topic = require("../database/schemas/Topic");
 const cache = require("../config/cache");
 
-topicsRouter.get("/", (req, res) => {
+exports.list = (req, res) => {
     try {
         const cacheKey = "topics";
 
@@ -31,6 +30,4 @@ topicsRouter.get("/", (req, res) => {
     } catch ({ message }) {
         res.status(500).json({ message });
     }
-});
-
-module.exports = topicsRouter;
+};
