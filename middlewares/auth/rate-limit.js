@@ -77,8 +77,8 @@ const rateLimiter = async (req, res, next) => {
             res.locals.user = user.data;
             next();
         }
-    } catch ({ message }) {
-        res.status(500).json({ message });
+    } catch (e) {
+        next(e);
     }
 };
 

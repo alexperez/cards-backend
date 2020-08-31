@@ -1,7 +1,7 @@
 const Topic = require("../database/schemas/Topic");
 const cache = require("../config/cache");
 
-exports.list = (req, res) => {
+exports.list = (req, res, next) => {
     try {
         const cacheKey = "topics";
 
@@ -18,7 +18,7 @@ exports.list = (req, res) => {
                 cache.set(
                     cacheKey,
                     JSON.stringify(topics),
-                    { expires: 60 * 60 * 24 },
+                    { expires: 60 * 60 * 24 * 20 },
                     (err) => {
                         if (err) throw err;
                     }
@@ -27,7 +27,7 @@ exports.list = (req, res) => {
 
             res.status(200).json({ topics });
         });
-    } catch ({ message }) {
-        res.status(500).json({ message });
+    } catch (e) {
+        next(e);
     }
 };

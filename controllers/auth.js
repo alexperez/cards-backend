@@ -1,5 +1,10 @@
 const User = require("../database/schemas/User");
-const { authValidatorRules, authValidator, rateLimiter } = require("../middlewares/auth");
+const {
+    authValidatorRules,
+    authValidator,
+    rateLimiter,
+    isAuthenticated,
+} = require("../middlewares/auth");
 const { getSessionUser } = require("../utilities");
 
 exports.session = (req, res) => {
@@ -8,10 +13,7 @@ exports.session = (req, res) => {
     res.json({ user, isAuthenticated: !!user });
 };
 
-exports.authValidatorRules = authValidatorRules;
-exports.authValidator = authValidator;
-
-exports.signup = async (req, res) => {
+exports.signup = async (req, res, next) => {
     try {
         const { username, email, password } = req.body;
         const data = { username, email, password };
@@ -24,12 +26,10 @@ exports.signup = async (req, res) => {
             user: sessionUser,
             isAuthenticated: true,
         });
-    } catch ({ message }) {
-        res.status(500).json({ message });
+    } catch (e) {
+        next(e);
     }
 };
-
-exports.rateLimiter = rateLimiter;
 
 exports.login = (req, res) => {
     const { user } = res.locals;
@@ -43,7 +43,7 @@ exports.login = (req, res) => {
     });
 };
 
-exports.logout = (req, res) => {
+exports.logout = (req, res, next) => {
     try {
         const { user } = req.session;
 
@@ -59,7 +59,12 @@ exports.logout = (req, res) => {
         } else {
             throw new Error("No user found.");
         }
-    } catch ({ message }) {
-        res.status(422).json({ message });
+    } catch (e) {
+        next(e);
     }
 };
+
+exports.authValidatorRules = authValidatorRules;
+exports.authValidator = authValidator;
+exports.rateLimiter = rateLimiter;
+exports.isAuthenticated = isAuthenticated;
