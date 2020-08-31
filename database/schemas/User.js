@@ -23,12 +23,6 @@ const UserSchema = new Schema(
             minlength: 6,
             trim: true,
         },
-        sets: [
-            {
-                type: Schema.Types.ObjectId,
-                ref: "Set",
-            },
-        ],
     },
     { timestamps: true }
 );
@@ -58,7 +52,7 @@ UserSchema.statics.createUser = async function (data) {
             if (user.username === username) {
                 throw new Error("Username not available.");
             } else if (user.email === email) {
-                throw new Error("Email already taken.");
+                throw new Error("Email not available.");
             }
         } else {
             const newUser = await this.create(data);
