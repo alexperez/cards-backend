@@ -34,8 +34,8 @@ UserSchema.pre("save", async function () {
             const hashedPassword = await hash(this.password, 10);
 
             this.password = hashedPassword;
-        } catch ({ message }) {
-            throw new Error(message);
+        } catch (e) {
+            throw e;
         }
     }
 });
@@ -59,8 +59,8 @@ UserSchema.statics.createUser = async function (data) {
 
             return newUser;
         }
-    } catch ({ message }) {
-        throw new Error(message);
+    } catch (e) {
+        throw e;
     }
 };
 
@@ -87,8 +87,8 @@ UserSchema.statics.authenticate = async function (login, password) {
 
             return { isLoggedIn: false, error };
         }
-    } catch ({ message }) {
-        throw new Error(message);
+    } catch (e) {
+        throw e;
     }
 };
 
