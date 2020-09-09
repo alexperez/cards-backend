@@ -27,6 +27,15 @@ const UserSchema = new Schema(
     { timestamps: true }
 );
 
+UserSchema.set("toJSON", { getters: true });
+
+UserSchema.options.toJSON.transform = (_, ret) => {
+    const obj = { ...ret };
+    delete obj._id;
+    delete obj.__v;
+    return obj;
+};
+
 UserSchema.pre("save", async function () {
     // Check if the document is new, then hash the password
     if (this.isNew) {
