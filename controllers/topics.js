@@ -2,18 +2,18 @@ const Topic = require("../database/schemas/Topic");
 const cache = require("../config/cache");
 
 exports.list = (req, res, next) => {
-    try {
-        const cacheKey = "topics";
+    const cacheKey = "topics";
 
-        cache.get(cacheKey, async (err, buffer) => {
-            let topics;
-
+    cache.get(cacheKey, async (err, buffer) => {
+        try {
             if (err) throw err;
+
+            let topics;
 
             if (buffer) {
                 topics = JSON.parse(buffer);
             } else {
-                topics = await Topic.find({}).exec();
+                topics = await Topic.find().exec();
 
                 cache.set(
                     cacheKey,
@@ -26,8 +26,8 @@ exports.list = (req, res, next) => {
             }
 
             res.status(200).json({ topics });
-        });
-    } catch (e) {
-        next(e);
-    }
+        } catch (e) {
+            next(e);
+        }
+    });
 };
