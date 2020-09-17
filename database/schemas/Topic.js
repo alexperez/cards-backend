@@ -8,7 +8,7 @@ const TopicSchema = new Schema({
     },
 });
 
-TopicSchema.set("toJSON", { getters: true });
+TopicSchema.set("toJSON", { getters: true, virutals: true });
 
 TopicSchema.options.toJSON.transform = (_, ret) => {
     const obj = { ...ret };
@@ -16,5 +16,12 @@ TopicSchema.options.toJSON.transform = (_, ret) => {
     delete obj.__v;
     return obj;
 };
+
+TopicSchema.virtual("slug").get(function () {
+    return this.name
+        .split(" ")
+        .map((w) => w.toLowerCase())
+        .join("-");
+});
 
 module.exports = model("Topic", TopicSchema);
