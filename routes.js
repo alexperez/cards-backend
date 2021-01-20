@@ -12,14 +12,16 @@ router.post("/login", auth.rateLimiter, users.login);
 router.post("/logout", users.logout);
 
 router.get("/topics", topics.list);
+router.get("/topics/:topic", sets.queryByTopic, sets.list);
 
 router.param("set", sets.load);
 router.get("/sets", sets.queryAll, sets.list);
-router.get("/sets/t/:topic", sets.queryTopic, sets.list);
 router.post("/sets", auth.isAuthenticated, sets.create);
 router.get("/sets/:set", sets.show);
 router.put("/sets/:set", auth.isAuthenticated, auth.setsAuth, sets.update);
 router.delete("/sets/:set", auth.isAuthenticated, auth.setsAuth, sets.delete);
+
+router.get("/users/:username", sets.queryByUser, sets.list);
 
 module.exports = (app) => {
     app.use("/api", router);

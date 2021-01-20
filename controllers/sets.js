@@ -1,4 +1,5 @@
 const Set = require("../database/schemas/Set");
+const User = require("../database/schemas/User");
 
 const queryPublicOrUser = (user) => ({
     $or: [{ public: true }, { user: user && user.id }],
@@ -11,7 +12,7 @@ exports.queryAll = (req, res, next) => {
     next();
 };
 
-exports.queryTopic = (req, res, next) => {
+exports.queryByTopic = (req, res, next) => {
     const { user } = req.session;
     const { topic } = req.params;
 
@@ -21,6 +22,24 @@ exports.queryTopic = (req, res, next) => {
 
     next();
 };
+
+exports.queryByUser = async (req, res, next) => {
+    try {
+        const { user } = req.session;
+        const { username } = req.params;
+        const userDoc = await User.findOne({ username });
+
+        if (!userDoc) return res.status(404).json({ message: "User not found." });
+
+        res.locals.query = {
+            $and: [{ user: userDoc.id }, queryPublicOrUser(user)],
+        }
+
+        next();
+    } catch (e) {
+        throw e;
+    }
+}
 
 exports.list = async (req, res, next) => {
     try {
@@ -60,14 +79,12 @@ exports.load = async (req, res, next, id) => {
             $and: [{ _id: id }, queryPublicOrUser(user)],
         }).populate("user", "id, username");
 
-        if (!set) {
-            return res.status(404).json({ message: "Set not found." })
-        }
+        if (!set) return res.status(404).json({ message: "Set not found." });
 
         res.locals.set = set;
         next();
     } catch (e) {
-        next(e);
+        throw e;
     }
 }
 
