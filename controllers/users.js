@@ -1,10 +1,4 @@
 const User = require("../database/schemas/User");
-const {
-    authValidatorRules,
-    authValidator,
-    rateLimiter,
-    isAuthenticated,
-} = require("../middlewares/auth");
 const { getSessionUser } = require("../utilities");
 
 exports.session = (req, res) => {
@@ -63,8 +57,3 @@ exports.logout = (req, res, next) => {
         next(e);
     }
 };
-
-exports.authValidatorRules = authValidatorRules;
-exports.authValidator = authValidator;
-exports.rateLimiter = rateLimiter;
-exports.isAuthenticated = isAuthenticated;
