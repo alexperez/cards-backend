@@ -23,6 +23,7 @@ const UserSchema = new Schema(
             minlength: 6,
             trim: true,
         },
+        admin: Boolean
     },
     { timestamps: true }
 );
