@@ -1,7 +1,6 @@
 const router = require("express").Router();
 
 const users = require("./controllers/users");
-const topics = require("./controllers/topics");
 const sets = require("./controllers/sets");
 
 const auth = require("./middlewares/auth");
@@ -11,11 +10,9 @@ router.post("/signup", auth.authValidatorRules(), auth.authValidator, users.sign
 router.post("/login", auth.rateLimiter, users.login);
 router.post("/logout", users.logout);
 
-router.get("/topics", topics.list);
-router.get("/topics/:topic", sets.queryByTopic, sets.list);
-
 router.param("set", sets.load);
 router.get("/sets", sets.queryAll, sets.list);
+router.get("/sets/t/:topic", sets.queryByTopic, sets.list);
 router.post("/sets", auth.isAuthenticated, sets.create);
 router.get("/sets/:set", sets.show);
 router.put("/sets/:set", auth.isAuthenticated, auth.setsAuth, sets.update);
