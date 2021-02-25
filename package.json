@@ -17,7 +17,6 @@
     "express-session": "^1.17.1",
     "express-validator": "^6.6.0",
     "helmet": "^3.22.0",
-    "memjs": "^1.2.2",
     "mongoose": "^5.9.17",
     "morgan": "^1.10.0",
     "rate-limiter-flexible": "^2.1.7",

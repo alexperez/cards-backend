@@ -33,13 +33,13 @@ exports.queryByUser = async (req, res, next) => {
 
         res.locals.query = {
             $and: [{ user: userDoc.id }, queryPublicOrUser(user)],
-        }
+        };
 
         next();
     } catch (e) {
         throw e;
     }
-}
+};
 
 exports.list = async (req, res, next) => {
     try {
@@ -86,9 +86,9 @@ exports.load = async (req, res, next, id) => {
     } catch (e) {
         throw e;
     }
-}
+};
 
-exports.show  = (req, res, next) => {
+exports.show = (req, res, next) => {
     const { set } = res.locals;
     res.status(200).json({ set });
 };
@@ -97,7 +97,7 @@ exports.update = async (req, res, next) => {
     try {
         const { set } = res.locals;
         const { title, public, cards, topic } = req.body;
-        
+
         set.title = title;
         set.public = public;
         set.cards = cards;
@@ -116,7 +116,7 @@ exports.delete = async (req, res, next) => {
         const { set } = res.locals;
         await Set.deleteOne(set);
 
-        res.status(200).json({ message: "Set deleted successfully." })
+        res.status(200).json({ message: "Set deleted successfully." });
     } catch (e) {
         next(e);
     }
