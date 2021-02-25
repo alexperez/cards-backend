@@ -1,0 +1,1 @@
+exports.errorFormatter = ({ msg }) => msg;

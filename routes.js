@@ -3,20 +3,21 @@ const router = require("express").Router();
 const users = require("./controllers/users");
 const sets = require("./controllers/sets");
 
-const auth = require("./middlewares/auth");
+const amw = require("./middlewares/auth");
+const smw = require("./middlewares/sets");
 
 router.get("/session", users.session);
-router.post("/signup", auth.authValidatorRules(), auth.authValidator, users.signup);
-router.post("/login", auth.rateLimiter, users.login);
+router.post("/signup", amw.validatorRules(), amw.validator, users.signup);
+router.post("/login", amw.rateLimiter, users.login);
 router.post("/logout", users.logout);
 
 router.param("set", sets.load);
 router.get("/sets", sets.queryAll, sets.list);
 router.get("/sets/t/:topic", sets.queryByTopic, sets.list);
-router.post("/sets", auth.isAuthenticated, sets.create);
+router.post("/sets", amw.isAuthenticated, smw.validatorRules(), smw.validator, sets.create);
 router.get("/sets/:set", sets.show);
-router.put("/sets/:set", auth.isAuthenticated, auth.setsAuth, sets.update);
-router.delete("/sets/:set", auth.isAuthenticated, auth.setsAuth, sets.delete);
+router.put("/sets/:set", amw.isAuthenticated, amw.setsAuth, smw.validatorRules(false), smw.validator, sets.update);
+router.delete("/sets/:set", amw.isAuthenticated, amw.setsAuth, sets.delete);
 
 router.get("/users/:username", sets.queryByUser, sets.list);
 

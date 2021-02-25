@@ -1,9 +1,10 @@
 const { body, validationResult } = require("express-validator");
 const blacklist = require("the-big-username-blacklist");
+const { errorFormatter } = require("../shared");
 
-const authValidatorRules = () => [
+exports.validatorRules = () => [
     body("username", "Username is required.").exists(),
-    body("username", "Username must be between 1 and 40 characters.").isLength({
+    body("username", "Username cannot exceed character limit of 40.").isLength({
         max: 40,
     }),
     body(
@@ -23,19 +24,15 @@ const authValidatorRules = () => [
     ).custom((value) => /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]/.test(value)),
 ];
 
-const errorFormatter = ({ msg }) => msg;
-
-const authValidator = (req, res, next) => {
+exports.validator = (req, res, next) => {
     const errors = validationResult(req).formatWith(errorFormatter);
 
     if (!errors.isEmpty()) {
         return res.status(400).json({
-            message: "Signup validation failed",
+            message: "Signup validation failed.",
             errors: errors.array(),
         });
     }
 
     next();
 };
-
-module.exports = { authValidatorRules, authValidator };

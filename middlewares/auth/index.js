@@ -1,4 +1,4 @@
-const { authValidatorRules, authValidator } = require("./validator");
+const { validatorRules, validator } = require("./validator");
 const rateLimiter = require("./rate-limit");
 
 exports.isAuthenticated = (req, res, next) => {
@@ -22,6 +22,6 @@ exports.setsAuth = (req, res, next) => {
     res.status(401).json({ message: "Unauthorized." });
 };
 
-exports.authValidatorRules = authValidatorRules;
-exports.authValidator = authValidator;
+exports.validatorRules = validatorRules;
+exports.validator = validator;
 exports.rateLimiter = rateLimiter;

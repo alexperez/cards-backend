@@ -28,7 +28,7 @@ const SetSchema = new Schema(
         title: {
             type: String,
             required: true,
-            maxlength: 200,
+            maxlength: 100,
             trim: true,
         },
         public: {
@@ -39,9 +39,11 @@ const SetSchema = new Schema(
         user: {
             type: Schema.Types.ObjectId,
             ref: "User",
+            required: true,
         },
         cards: {
             type: [FlashcardSchema],
+            required: true,
         },
         topic: {
             type: String,
@@ -65,19 +67,5 @@ SetSchema.options.toJSON.transform = (_, ret) => {
     delete obj.__v;
     return obj;
 };
-
-SetSchema.path("cards").validate(function(val) {
-    const cardLimit = 30;
-    
-    if (!Array.isArray(val)) {
-        throw new Error("Set cards must be an array.");
-    } else if (this.isNew && val.length === 0) {
-        throw new Error("Set must have at least one card.");
-    } else if (val.length > cardLimit) {
-        throw new Error(`Each set can have a max of ${cardLimit} flashcards.`);
-    }
-
-    return true;
-}, "Set validation cards error");
 
 module.exports = model("Set", SetSchema);
