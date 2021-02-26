@@ -3,7 +3,7 @@ const blacklist = require("the-big-username-blacklist");
 const { errorFormatter } = require("../shared");
 
 exports.validatorRules = () => [
-    body("username", "Username is required.").exists(),
+    body("username", "Username is required.").trim().exists({ checkFalsy: true }),
     body("username", "Username cannot exceed character limit of 40.").isLength({
         max: 40,
     }),
