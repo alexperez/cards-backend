@@ -59,7 +59,7 @@ UserSchema.statics.createUser = async function (data) {
         }).exec();
 
         if (user) {
-            if (user.username === username) {
+            if (user.username === username.toLowerCase()) {
                 throw new Error("Username not available.");
             } else if (user.email === email) {
                 throw new Error("Email not available.");

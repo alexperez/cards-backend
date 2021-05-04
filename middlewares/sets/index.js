@@ -9,8 +9,8 @@ exports.validatorRules = (isNew = true) => [
         max: 100,
     }),
     body("cards", "Set cards must be an array.").custom((value) => Array.isArray(value)),
-    body("cards", "Set must have at least one card.").custom((set) =>
-        isNew ? set.length !== 0 : true
+    body("cards", "Set must have at least two cards when created.").custom((set) =>
+        isNew ? set.length >= 2 : true
     ),
     body("cards", `Each set can have a max of ${cardLimit} flashcards.`).custom(
         (set) => set.length < cardLimit
