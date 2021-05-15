@@ -84,7 +84,7 @@ exports.load = async (req, res, next, id) => {
         res.locals.set = set;
         next();
     } catch (e) {
-        throw e;
+        next(e);
     }
 };
 
