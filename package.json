@@ -16,7 +16,7 @@
     "express-session": "^1.17.1",
     "express-validator": "^6.6.0",
     "helmet": "^3.22.0",
-    "mongoose": "^5.9.17",
+    "mongoose": "^5.12.11",
     "morgan": "^1.10.0",
     "rate-limiter-flexible": "^2.1.7",
     "request-ip": "^2.1.3",
