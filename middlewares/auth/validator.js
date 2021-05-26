@@ -3,7 +3,9 @@ const blacklist = require("the-big-username-blacklist");
 const { errorFormatter } = require("../shared");
 
 exports.validatorRules = () => [
-    body("username", "Username is required.").trim().exists({ checkFalsy: true }),
+    body("username", "Username is required.")
+        .trim()
+        .exists({ checkFalsy: true }),
     body("username", "Username cannot exceed character limit of 40.").isLength({
         max: 40,
     }),
@@ -21,7 +23,9 @@ exports.validatorRules = () => [
     body(
         "password",
         "Password must contain at least one uppercase letter, one lowercase letter and one number."
-    ).custom((value) => /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]/.test(value)),
+    ).custom((value) =>
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]/.test(value)
+    ),
 ];
 
 exports.validator = (req, res, next) => {

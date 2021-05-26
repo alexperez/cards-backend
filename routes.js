@@ -14,9 +14,22 @@ router.post("/logout", users.logout);
 router.param("set", sets.load);
 router.get("/sets", sets.queryAll, sets.list);
 router.get("/sets/t/:topic", sets.queryByTopic, sets.list);
-router.post("/sets", amw.isAuthenticated, smw.validatorRules(), smw.validator, sets.create);
+router.post(
+    "/sets",
+    amw.isAuthenticated,
+    smw.validatorRules(),
+    smw.validator,
+    sets.create
+);
 router.get("/sets/:set", sets.show);
-router.put("/sets/:set", amw.isAuthenticated, amw.setsAuth, smw.validatorRules(false), smw.validator, sets.update);
+router.put(
+    "/sets/:set",
+    amw.isAuthenticated,
+    amw.setsAuth,
+    smw.validatorRules(false),
+    smw.validator,
+    sets.update
+);
 router.delete("/sets/:set", amw.isAuthenticated, amw.setsAuth, sets.delete);
 
 router.get("/users/:username", sets.queryByUser, sets.list);

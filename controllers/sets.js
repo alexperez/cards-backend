@@ -29,7 +29,9 @@ exports.queryByUser = async (req, res, next) => {
         const { username } = req.params;
         const userDoc = await User.findOne({ username });
 
-        if (!userDoc) return res.status(404).json({ message: "User not found." });
+        if (!userDoc) {
+            return res.status(404).json({ message: "User not found." });
+        }
 
         res.locals.query = {
             $and: [{ user: userDoc.id }, queryPublicOrUser(user)],

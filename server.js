@@ -5,7 +5,6 @@ if (process.env.NODE_ENV !== "production") {
 const express = require("express");
 const morgan = require("morgan");
 const helmet = require("helmet");
-const cors = require("cors");
 
 const initDB = require("./database");
 const session = require("./config/session");
@@ -17,10 +16,9 @@ initDB()
     .catch(console.error);
 
 app.on("ready", (dbConnection) => {
-    app.set("trust proxy", 1);
+    app.set("trust proxy", true);
     app.use(helmet());
     app.use(morgan("tiny"));
-    app.use(cors());
     app.use(express.urlencoded({ extended: true }));
     app.use(express.json());
     app.use(session(dbConnection));
