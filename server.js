@@ -2,6 +2,7 @@ if (process.env.NODE_ENV !== "production") {
     require("dotenv").config();
 }
 
+const path = require("path");
 const express = require("express");
 const morgan = require("morgan");
 const helmet = require("helmet");
@@ -17,6 +18,7 @@ initDB()
 
 app.on("ready", (dbConnection) => {
     app.set("trust proxy", true);
+    app.use(express.static(path.join(__dirname, "client/build")));
     app.use(helmet());
     app.use(morgan("tiny"));
     app.use(express.urlencoded({ extended: true }));

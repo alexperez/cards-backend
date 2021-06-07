@@ -1,3 +1,4 @@
+const path = require("path");
 const router = require("express").Router();
 
 const users = require("./controllers/users");
@@ -38,7 +39,7 @@ module.exports = (app) => {
     app.use("/api", router);
 
     app.get("*", (req, res) => {
-        res.status(404).json({ message: "Not found." });
+        res.sendFile(path.join(__dirname, "client/build/index.html"));
     });
 
     app.use(({ name, message }, req, res, next) => {
