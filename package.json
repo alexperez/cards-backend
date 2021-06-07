@@ -6,7 +6,8 @@
   "author": "Alex Perez <alex.alb.perez@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "start": "nodemon server.js"
+    "start": "nodemon server.js",
+    "heroku-postbuild": "cd client && yarn && yarn run build"
   },
   "dependencies": {
     "bcrypt": "^5.0.0",
